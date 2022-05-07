@@ -10,20 +10,21 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.ui.PlayerControlView
 import com.google.android.exoplayer2.ui.PlayerView
+import com.jakey.exoplayertutorial.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity(), Player.Listener {
 
+    private lateinit var binding: ActivityMainBinding
     private lateinit var player: ExoPlayer
-    private lateinit var playerView: PlayerView
-    private lateinit var progressBar: ProgressBar
-    private lateinit var titleTv: TextView
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        progressBar = findViewById(R.id.progressBar)
-        titleTv = findViewById(R.id.title)
+//        binding.progressBar = findViewById(R.id.progressBar)
+//        titleTv = findViewById(R.id.title)
 
         setupPlayer()
         addMp3Files()
@@ -48,8 +49,7 @@ class MainActivity : AppCompatActivity(), Player.Listener {
 
     private fun setupPlayer() {
         player = ExoPlayer.Builder(this).build()
-        playerView = findViewById(R.id.video_view)
-        playerView.player = player
+        binding.videoView.player = player
         player.addListener(this)
     }
 
@@ -69,8 +69,8 @@ class MainActivity : AppCompatActivity(), Player.Listener {
         super.onPlaybackStateChanged(playbackState)
 
         when (playbackState) {
-            Player.STATE_BUFFERING -> progressBar.visibility = View.VISIBLE
-            Player.STATE_READY -> progressBar.visibility = View.INVISIBLE
+            Player.STATE_BUFFERING -> binding.progressBar.visibility = View.VISIBLE
+            Player.STATE_READY -> binding.progressBar.visibility = View.INVISIBLE
         }
     }
 
@@ -82,6 +82,6 @@ class MainActivity : AppCompatActivity(), Player.Listener {
     override fun onMediaMetadataChanged(mediaMetadata: MediaMetadata) {
         super.onMediaMetadataChanged(mediaMetadata)
 
-        titleTv.text = mediaMetadata.title ?: mediaMetadata.displayTitle ?: "title not found"
+        binding.title.text = mediaMetadata.title ?: mediaMetadata.displayTitle ?: "title not found"
     }
 }
