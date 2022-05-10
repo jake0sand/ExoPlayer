@@ -6,7 +6,10 @@ import android.os.PersistableBundle
 import android.view.View
 import android.widget.ProgressBar
 import android.widget.TextView
+import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.ui.PlayerControlView
 import com.google.android.exoplayer2.ui.PlayerView
@@ -16,35 +19,36 @@ class MainActivity : AppCompatActivity(), Player.Listener {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var player: ExoPlayer
-
+    private lateinit var viewModel: MainViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-//        binding.progressBar = findViewById(R.id.progressBar)
-//        titleTv = findViewById(R.id.title)
+        viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
+
+
+
 
         setupPlayer()
         addMp3Files()
         addMp4Files()
-
-        if (savedInstanceState != null) {
-            savedInstanceState.getInt("MediaItem").let { restoredMedia ->
-                val seekTime  = savedInstanceState.getLong("SeekTime")
-                player.seekTo(restoredMedia, seekTime)
-                player.play()
-            }
-        }
+//        player.seekTo(viewModel.restoreMediaLiveData.value!!, seekTime!!)
+//        player.play()
+        player.seekTo(viewModel.restoreMediaLiveData.value!!, viewModel.seekTimeLiveData.value!!)
+        getLiveData()
 
     }
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-
-        outState.putLong("SeekTime", player.currentPosition)
-        outState.putInt("MediaItem", player.currentMediaItemIndex)
+    private fun getLiveData() {
+        viewModel.seekTimeLiveData.observe(this, Observer {
+            viewModel.getSeekTimeLiveData(player.currentPosition)
+        })
+        viewModel.restoreMediaLiveData.observe(this, Observer {
+            viewModel.getRestoreMediaLiveData(player.currentMediaItemIndex)
+        })
+        player.play()
     }
 
     private fun setupPlayer() {
