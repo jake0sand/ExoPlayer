@@ -2,17 +2,10 @@ package com.jakey.exoplayertutorial
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.os.PersistableBundle
 import android.view.View
-import android.widget.ProgressBar
-import android.widget.TextView
-import android.widget.Toast
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.exoplayer2.*
-import com.google.android.exoplayer2.ui.PlayerControlView
-import com.google.android.exoplayer2.ui.PlayerView
 import com.jakey.exoplayertutorial.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity(), Player.Listener {
@@ -27,28 +20,33 @@ class MainActivity : AppCompatActivity(), Player.Listener {
         setContentView(binding.root)
 
         viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
+        getLiveData()
+    }
 
-
-
+    override fun onStart() {
+        super.onStart()
 
         setupPlayer()
         addMp3Files()
         addMp4Files()
-//        player.seekTo(viewModel.restoreMediaLiveData.value!!, seekTime!!)
-//        player.play()
-        player.seekTo(viewModel.restoreMediaLiveData.value!!, viewModel.seekTimeLiveData.value!!)
-        getLiveData()
-
+        player.seekTo(
+            viewModel.restoreMediaLiveData.value ?: 0,
+            viewModel.seekTimeLiveData.value ?: 0
+        )
+        player.play()
     }
 
-    private fun getLiveData() {
+
+
+    fun getLiveData() {
+
         viewModel.seekTimeLiveData.observe(this, Observer {
-            viewModel.getSeekTimeLiveData(player.currentPosition)
+            viewModel.setSeekTimeLiveData(player.currentPosition)
         })
         viewModel.restoreMediaLiveData.observe(this, Observer {
-            viewModel.getRestoreMediaLiveData(player.currentMediaItemIndex)
+            viewModel.setRestoreMediaLiveData(player.currentMediaItemIndex)
         })
-        player.play()
+
     }
 
     private fun setupPlayer() {
@@ -80,6 +78,7 @@ class MainActivity : AppCompatActivity(), Player.Listener {
 
     override fun onStop() {
         super.onStop()
+        getLiveData()
         player.release()
     }
 

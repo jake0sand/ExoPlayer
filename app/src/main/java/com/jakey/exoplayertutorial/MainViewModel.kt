@@ -14,12 +14,9 @@ class MainViewModel: ViewModel() {
     private val _restoreMediaLiveData = MutableLiveData(0)
     val restoreMediaLiveData: LiveData<Int> = _restoreMediaLiveData
 
-    fun getSeekTimeLiveData(l: Long) {
-
+    fun setSeekTimeLiveData(l: Long) {
             _seekTimeLiveData.postValue(l)
-
     }
-    fun getRestoreMediaLiveData(i: Int) =
+    fun setRestoreMediaLiveData(i: Int) =
         _restoreMediaLiveData.postValue(i)
-
 }
